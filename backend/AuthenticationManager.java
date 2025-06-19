@@ -9,7 +9,7 @@ package backend;
 import java.util.ArrayList;
 import java.util.List;
 
-public class authenticationManager {
+public class AuthenticationManager {
 
     //Attributes we only need one to list all the users
     private List<User> userList;
@@ -17,7 +17,7 @@ public class authenticationManager {
     //Constructor
 
 
-    public authenticationManager(List<User> userList) {
+    public AuthenticationManager(List<User> userList) {
         this.userList = userList;
     }
 
@@ -42,24 +42,24 @@ public class authenticationManager {
         }
     }
 
-    public boolean loginUser (String userName, String password){
+    public User loginUser(String userName, String password) {
         try {
             if (userName == null || userName.isEmpty() || password == null || password.isEmpty()) {
-                return false;
+                return null;
             }
 
             for (User user : userList) {
                 if (user.getUserName().equals(userName) && user.getPassword().equals(password)) {
-                    return true;
+                    return user;
                 }
             }
-            return false;
+            return null;
         } catch (Exception e) {
-            System.out.println("Error logining user: " + e.getMessage());
-            return false;
+            System.out.println("Error logging in user: " + e.getMessage());
+            return null;
         }
-
     }
+
 
     public List<User> getUserList () {
         return userList;

@@ -7,6 +7,7 @@
 package backend;
 
 import java.util.ArrayList;
+import java.util.InputMismatchException;
 import java.util.List;
 
 public class Anime {
@@ -18,6 +19,9 @@ public class Anime {
 
     // title is as listed the title of the anime
     private String title;
+
+    //genre is the broad description of the anime
+    private String genre;
 
     // eps refers to the episodes watched to track the progress
     private int epsWatched;
@@ -33,23 +37,51 @@ public class Anime {
 
     // Constructors
 
-    public Anime(int id, String title, int epsWatched, int totalEps, String status, double rating) {
-        this.id = id;
-        this.title = title;
-        this.epsWatched = epsWatched;
-        this.totalEps = totalEps;
-        this.status = status;
-        this.rating = rating;
+    public Anime() {}
+
+    public Anime(int id, String title, String genre, int epsWatched, int totalEps, String status, double rating) {
+        setId(id);
+        setTitle(title);
+        setGenre(genre);
+        setEpsWatched(epsWatched);
+        setTotalEps(totalEps);
+        setStatus(status);
+        setRating(rating);
     }
 
     // Getters and Setters
+
+    public String getGenre() {
+        return genre;
+    }
+
+    public void setGenre(String genre) {
+        try {
+            if (genre != null && genre.equals("")) {
+                throw new IllegalArgumentException(" Genre cannot be empty");
+
+            }
+            this.genre = genre;
+        } catch (InputMismatchException e) {
+            throw new IllegalArgumentException(" Genre cannot be numbers");
+        }
+    }
 
     public int getId() {
         return id;
     }
 
     public void setId(int id) {
-        this.id = id;
+
+        try{
+            if (id < 0 || id > 100) {
+                throw new IllegalArgumentException(" Id must be between 0 and 100");
+            }
+            this.id = id;
+        } catch (InputMismatchException e) {
+            throw new IllegalArgumentException(" Id must be a integer between 0 and 100");
+        }
+
     }
 
     public String getTitle() {
@@ -57,6 +89,15 @@ public class Anime {
     }
 
     public void setTitle(String title) {
+
+        try {
+            if (title == null || title.trim().isEmpty()) {
+                throw new IllegalArgumentException(" Title cannot be empty");
+            }
+        } catch (InputMismatchException e) {
+            throw new IllegalArgumentException(" Title must only contain alphabetical characters");
+        }
+
         this.title = title;
     }
 
@@ -65,6 +106,14 @@ public class Anime {
     }
 
     public void setEpsWatched(int epsWatched) {
+
+        try {
+            if (epsWatched < 0) {
+                throw new IllegalArgumentException(" EpsWatched cannot be negative");
+            }
+        } catch (InputMismatchException e) {
+            throw new IllegalArgumentException(" EpsWatched must only contain numeric characters");
+        }
         this.epsWatched = epsWatched;
     }
 
@@ -73,6 +122,14 @@ public class Anime {
     }
 
     public void setTotalEps(int totalEps) {
+
+        try {
+            if (totalEps < 0) {
+                throw new IllegalArgumentException(" TotalEps cannot be negative");
+            }
+        } catch (InputMismatchException e) {
+            throw new IllegalArgumentException(" TotalEps must only contain numeric characters");
+        }
         this.totalEps = totalEps;
     }
 
@@ -81,6 +138,14 @@ public class Anime {
     }
 
     public void setStatus(String status) {
+
+        try {
+            if (status == null || status.trim().isEmpty()) {
+                throw new IllegalArgumentException(" Status cannot be empty");
+            }
+        } catch (InputMismatchException e) {
+            throw new IllegalArgumentException(" Status must only contain alphabetical characters");
+        }
         this.status = status;
     }
 
@@ -89,27 +154,34 @@ public class Anime {
     }
 
     public void setRating(double rating) {
+
+        try {
+            if (rating < 0.0 || rating > 10.0) {
+                throw new IllegalArgumentException(" Rating must be between 0 and 10");
+            }
+        } catch (InputMismatchException e) {
+            throw new IllegalArgumentException(" Rating must only contain numeric characters");
+        }
         this.rating = rating;
     }
 
 
 
-    public static Anime fromCSV(String line){
+
+    public static Anime fromTxt(String line){
         String[] parts = line.split(",");
         int id = Integer.parseInt(parts[0]);
         String title = parts[1];
-        int epsWatched = Integer.parseInt(parts[2]);
-        int totalEps = Integer.parseInt(parts[3]);
-        String status = parts[4];
-        double rating = Double.parseDouble(parts[5]);
+        String genre = parts[2];
+        int epsWatched = Integer.parseInt(parts[3]);
+        int totalEps = Integer.parseInt(parts[4]);
+        String status = parts[5];
+        double rating = Double.parseDouble(parts[6]);
 
-        return new Anime(id, title, epsWatched, totalEps, status, rating);
+        return new Anime(id, title, genre, epsWatched, totalEps, status, rating);
     }
 
-    List<Anime> animeList = new ArrayList<>();
-    String lineFromFile = "1,Naruto,100,200,Watching,8.5";
 
-    Anime anime = Anime.fromCSV(lineFromFile);
 
     // to string
 
@@ -117,12 +189,13 @@ public class Anime {
     public String toString() {
         return "Anime{" +
                 "id=" + id +
-                ", title='" + title + '\'' +
-                ", epsWatched=" + epsWatched +
-                ", totalEps=" + totalEps +
-                ", status='" + status + '\'' +
-                ", rating=" + rating +
-                '}';
+                "| ~~\ntitle -'" + title + '\'' +
+                "| ~~\ngenre -'" + genre + '\'' +
+                "| ~~\nepsWatched -" + epsWatched +
+                "| ~~\ntotalEps -" + totalEps +
+                "| ~~\nstatus -'" + status + '\'' +
+                "| ~~\nrating -" + rating +
+                '|';
     }
 
 
