@@ -1,0 +1,5 @@
+2,Naruto,Shonen,100,220,Watching,8.5
+3,Fullmetal Alchemist,Action,64,64,Completed,9.2
+4,My Hero Academia,Superhero,75,113,Watching,7.8
+5,Spirited Away,Fantasy,1,1,Watched,9.0
+6,Death Note,Thriller,64,37,Completed,8.5

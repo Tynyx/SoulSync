@@ -15,6 +15,33 @@ import java.util.*;
 
 public class Main {
 
+    private static String prompt(String message, Scanner sc) {
+        System.out.print(message);
+        return sc.nextLine().trim();
+    }
+
+    private static int promptInt(String message, Scanner sc) {
+       while (true) {
+           System.out.print(message);
+           try {
+               return Integer.parseInt(sc.nextLine().trim());
+           } catch (NumberFormatException e) {
+               System.out.println("Please enter a whole number");
+           }
+       }
+
+    }
+
+    private static double promptDouble(String message, Scanner sc) {
+        while (true) {
+            System.out.print(message);
+            try {
+                return Double.parseDouble(sc.nextLine().trim());
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter a decimal number (e.g. 7.5).");
+            }
+        }
+    }
 
     // attributes calling on some of the list and methods we created in the classes
     // we have an hardcoded login becuase we cant store users at the moment so we using this as the
@@ -35,10 +62,8 @@ public class Main {
         // 2) Login loop
         while (loggedInUser == null) {
             System.out.println("\n==== SoulSync ====");
-            System.out.print("Enter username: ");
-            String uname = scanner.nextLine().trim();
-            System.out.print("Enter password: ");
-            String pass = scanner.nextLine().trim();
+            String uname = prompt("Enter Username", scanner);
+            String pass = prompt("Enter Password", scanner);
 
             loggedInUser = authManager.loginUser(uname, pass);
             if (loggedInUser == null) {
@@ -57,31 +82,25 @@ public class Main {
             System.out.println("5. Upload Anime TXT");
             System.out.println("6. Get Recommended Anime");
             System.out.println("7. Exit");
-            System.out.print("Choose an option: ");
 
-            String choice = scanner.nextLine().trim();
+
+            String choice = prompt("Choose an option", scanner);
             switch (choice) {
                 case "1":
                     // ——— Add Anime with full validation ———
                     while (true) {
                         try {
-                            System.out.print("Anime Title: ");
-                            String title = scanner.nextLine().trim();
+                            String title = prompt("Anime Title: ", scanner);
 
-                            System.out.print("Genre: ");
-                            String genre = scanner.nextLine().trim();
+                            String genre = prompt("Genre: ", scanner);
 
-                            System.out.print("Total Episodes: ");
-                            int total = Integer.parseInt(scanner.nextLine().trim());
+                            int total = promptInt("Total Episodes: ", scanner);
 
-                            System.out.print("Episodes Watched: ");
-                            int watched = Integer.parseInt(scanner.nextLine().trim());
+                            int watched = promptInt("Watched Episodes: ", scanner);
 
-                            System.out.print("Status: ");
-                            String status = scanner.nextLine().trim();
+                            String status = prompt("Status: ", scanner);
 
-                            System.out.print("Rating (0.0–10.0): ");
-                            double rating = Double.parseDouble(scanner.nextLine().trim());
+                            double rating = promptDouble("Rating: ", scanner);
 
                             // Create & add
                             Anime prototype = new Anime(0, title, genre, watched, total, status, rating);
@@ -104,36 +123,37 @@ public class Main {
                 case "2":
                     // —— UPDATE by Title ——
                     System.out.print("Enter exact Anime Title to update: ");
-                    String toEdit = scanner.nextLine().trim();
-                    Optional<Anime> opt = loggedInUser.getAnimeList().stream()
-                            .filter(a -> a.getTitle().equalsIgnoreCase(toEdit))
-                            .findFirst();
 
-                    if (opt.isEmpty()) {
-                        System.out.println("❌ No anime found with title: " + toEdit);
-                    } else {
-                        Anime edit = opt.get();
-                        try {
-                            System.out.print("New Episodes Watched (current " + edit.getEpsWatched() + "): ");
-                            int newWatched = Integer.parseInt(scanner.nextLine().trim());
-                            edit.setEpsWatched(newWatched);
 
-                            System.out.print("New Status (current “" + edit.getStatus() + "”): ");
-                            edit.setStatus(scanner.nextLine().trim());
 
-                            System.out.print("New Rating (current " + edit.getRating() + "): ");
-                            edit.setRating(Double.parseDouble(scanner.nextLine().trim()));
+                    String toEdit = prompt("Soul to Sync: ", scanner);
+                    String newGenre = prompt("New Genre:", scanner);
+                    int newWatchedEpisodes = promptInt("New Episodes Watched: ", scanner);
+                    int newTotalEpisodes =  promptInt("New Total Episodes: ", scanner);
+                    String newStatus = prompt("New Status: ", scanner);
+                    double newRating = promptDouble("New Rating: ", scanner);
 
-                            System.out.println("✔ Updated “" + edit.getTitle() + "” successfully.");
-                        } catch (Exception e) {
-                            System.out.println("❌ Update failed: " + e.getMessage());
-                        }
-                    }
+
+
+                    Anime patch = new Anime(
+                            0,
+                            toEdit,
+                            newGenre,
+                            newWatchedEpisodes,
+                            newTotalEpisodes,
+                            newStatus,
+                            newRating
+                    );
+
+                    boolean ok = watchManager.updateAnime(toEdit, patch );
+                    System.out.println(ok
+                    ? ":checkmark:"+ toEdit + " was Sync Successfully"
+                            : " :error: No anime found titled : " + toEdit + "'");
                     break;
                 case "3":
                     // ——— Delete by title ———
                     System.out.print("Enter exact Anime Title to delete: ");
-                    String toDelete = scanner.nextLine().trim();
+                    String toDelete = prompt("Soul to Erase: ", scanner);
                     boolean removed = loggedInUser.getAnimeList()
                             .removeIf(a -> a.getTitle().equalsIgnoreCase(toDelete));
                     System.out.println(removed
@@ -156,7 +176,7 @@ public class Main {
 
                 case "5":
                     System.out.print("Enter Soul link to your anime list (.txt), (be sure to remove quotes): ");
-                    String soulLink = scanner.nextLine();
+                    String soulLink = prompt("Soul Link: ", scanner);
                     watchManager.loadAnimeFile(soulLink);
 
                     loggedInUser.getAnimeList().clear();
@@ -166,37 +186,30 @@ public class Main {
 
 
                 case "6":
-                    // ——— Recommend top-3 by rating ———
-                    System.out.println("\nTop 3 Recommendations:");
-                    loggedInUser.getAnimeList().stream()
-                            .sorted(Comparator.comparingDouble(Anime::getRating).reversed())
-                            .limit(3)
-                            .forEach(a -> System.out.println("  " + a.getTitle() + " (" + a.getRating() + ")"));
-                    break;
-
-                case "7":
-                    System.out.println("Do you wish to save your anime list? (Y/N)");
-                    String save = scanner.nextLine().trim();
-
-                    if (save.contentEquals("N")) {
-                        System.out.println("Thank you for using our anime list!");
-                        System.out.println("Good bye!");
-                        System.exit(0);
+                    // ——— Recommend top-5  by Score and rating ———
+                    List<Anime> recs = watchManager.recommendAnime(
+                            watchManager.getAnimeList(),
+                            loggedInUser.getAnimeList(),
+                            5
+                    );
+                    System.out.println("\nYour SoulSync Recommendations:");
+                    if (recs.isEmpty()) {
+                        System.out.println("  (no recommendations available)");
                     } else {
-                        System.out.print("Enter .txt filename to Sync your current list (e.g. mylist.txt): ");
-                        String outPath = scanner.nextLine().trim();
-
-                        if (!outPath.toLowerCase().endsWith(".txt")) {
-                            System.out.println("❌ You must specify a .txt filename.");
-                        } else {
-                            try {
-                                watchManager.saveAnimeFile(outPath, loggedInUser.getAnimeList());
-                                System.out.println("✅ Saved " + loggedInUser.getAnimeList().size() + " entries to " + outPath);
-                            } catch (IOException ioe) {
-                                System.out.println("❌ Sync failed: " + ioe.getMessage());
-                            }
+                        for (int i = 0; i < recs.size(); i++) {
+                            Anime a = recs.get(i);
+                            System.out.printf("  %d) %s (%.1f) — %s%n",
+                                    i+1, a.getTitle(), a.getRating(), a.getGenre());
                         }
                     }
+                 break;
+
+                case "7":
+
+                        System.out.println("Transcend you Soul!");
+                        System.out.println("Good bye!");
+                        System.exit(0);
+
                     break;
 
             }

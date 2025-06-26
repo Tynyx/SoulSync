@@ -1,0 +1,23 @@
+Naruto,Shonen,100,220,Watching,8.5
+Fullmetal Alchemist,Action,64,64,Completed,9.2
+My Hero Academia,Superhero,75,113,Watching,7.8
+Spirited Away,Fantasy,1,1,Watched,9.0
+Death Note,Thriller,37,37,Completed,9.5
+Sword Art Online, Fantasy, 438, 438, Completed, 6.7
+One Piece, Adventure, 340, 1110, Watching, 3.4
+Fire Force, Action, 60, 60, Watching, 7.6
+Kingdom, Action, 142, 142, Watching, 8.2
+Demon Slayer, Dark Fantasy, 63, 63, On-Going, 9.1
+Wistoria: Wand and Sword, Adventure, 12, 12, On-Going, 8.5
+Dances with the Dragons, Dark Fantasy, 12, 12, Completed, 6.0
+The Irregular at Magic High School, fantasy, 39, 39, Completed, 6.8
+Classroom of the Elite, Psychological Thriller, 38, 38, On-Going, 7.8
+The Promise Neverland, Mystery, 23, 23, Completed, 8.5
+Gleipnir, Dark Fantasy, 13, 13, Completed, 7.8
+Samurai Champloo, Adventure, 26, 26, Completed, 9.3
+Astra Lost in Space, Sci-Fi, 12, 12, Completed, 6.7
+Steins;Gate, Sci-Fi, 24, 24, Completed, 7.6
+Made in Abyss, Dark Fantasy, 13, 13, Completed, 6.5
+Erased, Mystery, 12, 12, Completed, 7.7
+Pyscho-Pass, Psychological Thriller, 22, 22, Completed, 8.4
+Mushoku Tensei: Jobless Reincarnation, Fantasy, 23, 23, On-Going, 6.7

@@ -9,9 +9,9 @@
 package backend;
 
 import java.io.*;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class WatchListManager {
 
@@ -20,6 +20,8 @@ public class WatchListManager {
     private int nextId = 1;
 
     // Constructor
+
+    // Determine the next available ID by filtering the highest existing ID in the list and adding 1.
     public WatchListManager(List<Anime> animeList) {
         this.animeList =  animeList;
 
@@ -29,29 +31,38 @@ public class WatchListManager {
                 .ifPresent(max -> nextId = max + 1);
     }
 
+    // method AddAnime is a method to add anime From CLI command add Anime
     public Anime addAnime(Anime toAdd) {
         toAdd.setId(nextId++);
         animeList.add(toAdd);
         return toAdd;
     }
 
-
+    // Create a map to look up anime by name for quick access and not have to input ID
+    public List<Anime> searchAnimeByName(String keyword) {
+        return animeList.stream()
+                .filter(anime -> anime.getTitle().toLowerCase().contains(keyword.toLowerCase()))
+                .collect(Collectors.toList());
+    }
 
     //method updateAnime another boolean to make sure the anime was updated or not
-    public boolean updateAnimeById(int id, Anime newAnime) {
-        for (int i = 0; i < animeList.size(); i++) {
-            if (animeList.get(i).getId() == id) {
-                animeList.set(i, newAnime);
+    public boolean updateAnime(String title, Anime patch) {
+        for (Anime a : animeList) {
+            if (a.getTitle().toLowerCase().contains(title.toLowerCase())) {
+                a.setTitle(patch.getTitle());
+                a.setEpsWatched(patch.getEpsWatched());
+                a.setTotalEps(patch.getTotalEps());
+                a.setStatus(patch.getStatus());
+                a.setRating(patch.getRating());
+                a.setGenre(patch.getGenre());
                 return true;
             }
         }
         return false;
     }
-
-
     // now this method is removeAnime if you want to actually remove an anime from your list
-    public boolean deleteAnimeById(int id) {
-        return animeList.removeIf(anime -> anime.getId() == id);
+    public boolean deleteAnime(String title) {
+        return animeList.removeIf(a -> a.getTitle().equalsIgnoreCase(title));
     }
 
 
@@ -68,11 +79,12 @@ public class WatchListManager {
      * Load anime entries from a .txt file (no ID column).
      * Each line must be: title,genre,epsWatched,totalEps,status,rating
      */
-    public void loadAnimeFile(String soulLink) {
+    public List<Anime> loadAnimeFile(String soulLink) {
+        List<Anime> result = new ArrayList<>();
         File file = new File(soulLink);
         if (!file.exists()) {
             System.out.println("❌ Soul file not found: " + soulLink);
-            return;
+            return Collections.emptyList();
         }
 
         try (Scanner filescanner = new Scanner(file)) {
@@ -109,6 +121,7 @@ public class WatchListManager {
 
                     // create with auto-ID
                     Anime anime = new Anime(nextId++, title, genre, epsWatched, totalEps, status, rating);
+                    result.add(anime);
                     animeList.add(anime);
                     System.out.println("✔ Synced: " + title);
 
@@ -126,6 +139,8 @@ public class WatchListManager {
             // already checked .exists(), but just in case
             System.out.println("❌ Soul file not found at: " + soulLink);
         }
+        this.animeList.addAll(result);
+        return result;
     }
 
     /**
@@ -156,9 +171,44 @@ public class WatchListManager {
 
 
 
-    public List<Anime> searchAnimeByName(String keyword) {
-        return animeList.stream()
-                .filter(anime -> anime.getTitle().toLowerCase().contains(keyword.toLowerCase()))
+
+
+    // Recommendation method is the feature used to tally up your most watched genre
+    // and highest rating to generate from the full database and recommendation
+    // with those criteria
+    public List<Anime> recommendAnime(
+            List<Anime> allAnime,
+            List<Anime> userWatchList,
+            int topN) {
+        // Step one Determine if the user has data to generate a recommendation
+        if (userWatchList.isEmpty()) {
+            return allAnime.stream()
+                    .sorted(Comparator.comparing(Anime::getRating).reversed())
+                    .limit(topN)
+                    .collect(Collectors.toList());
+        }
+
+        // Determine the users favorite genre
+        Map<String, Long> counts = userWatchList.stream()
+                .collect(Collectors.groupingBy(Anime::getGenre, Collectors.counting()));
+        String favoriteGenre = Collections
+                .max(counts.entrySet(), Map.Entry.comparingByValue())
+                .getKey();
+
+        // From the entire catalog, pick those in the same genre, excluding what they already watched
+        List<Anime> candidates = allAnime.stream()
+                .filter(a -> a.getGenre().equalsIgnoreCase(favoriteGenre))
+                .filter(a -> userWatchList.stream()
+                        .noneMatch(w -> w.getTitle().equalsIgnoreCase(a.getTitle())))
                 .collect(Collectors.toList());
+
+        // Sort those candidates by rating descending
+        candidates.sort(Comparator.comparingDouble(Anime::getRating).reversed());
+
+        //Return the top N ( or fewer, if there aren't enough)
+        return candidates.stream().limit(topN).collect(Collectors.toList());
+
     }
 }
+
+
