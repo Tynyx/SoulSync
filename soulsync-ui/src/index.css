@@ -1,0 +1,31 @@
+/* src/index.css */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* reset & full-height */
+
+  /* global background + typography */
+  body {
+
+    background: url('../public/BackSoul.png') no-repeat center center fixed;
+    background-size: cover;
+  }
+}
+
+@layer components {
+  /* your neon hover util */
+  .neon-hover:hover {
+    box-shadow:
+            0 0 8px rgba(0,194,255,0.7),
+            0 0 16px rgba(0,194,255,0.5);
+  }
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  font-color:
+}
